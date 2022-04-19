@@ -6,11 +6,15 @@ import base64
 import hashlib
 import time
 import uuid
+import logging
 from urllib.parse import quote
 from requests import post, get
 from urllib3 import disable_warnings
 
 disable_warnings()
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 os.environ['FLASK_ENV']="development"
 
