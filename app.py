@@ -1,5 +1,6 @@
 import flask
 import json
+import os
 from flask import request
 import base64
 import hashlib
@@ -10,6 +11,8 @@ from requests import post, get
 from urllib3 import disable_warnings
 
 disable_warnings()
+
+os.environ['FLASK_ENV']="development"
 
 server = flask.Flask(__name__)
 
@@ -172,4 +175,4 @@ def main():
 
 
 if __name__ == '__main__':
-    server.run(host='127.0.0.1', port=9000, debug=True)
+    server.run(host='127.0.0.1', port=9000, debug=False)
