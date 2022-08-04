@@ -107,17 +107,14 @@ def sub_126AC(input, random1, random2):
 
 
 def get_sign(functionId, body, uuid, client, clientVersion):
-    st = int(time.time())
+    st = str(int(time.time() * 1000))
     random1 = random.randint(0, 2)
     random2 = random.randint(0, 2)
-    sv = "%s%s" % (random1, random2)
- 
-    input = "functionId=%s&body=%s&uuid=%s&client=%s&clientVersion=%s&st=%s&sv=1%s" % (
-        functionId, body, uuid, client, clientVersion, st, sv)
-    ret_bytes = sub_126AC(str.encode(input), random1, random2)
-    
-    return hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()
-
+    sv = f"{random1}{random2}"
+    string = f"functionId={functionId}&body={body}&uuid={uuid}&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
+    ret_bytes = sub_126AC(str.encode(string), random1, random2)
+    sign = f"client={client}&clientVersion={clientVersion}&uuid={uuid}&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
+    return sign
 
 def get_cookie(sign, body, key):
     url = f"https://api.m.jd.com/client.action?functionId=genToken&{sign}"
@@ -167,7 +164,7 @@ def main():
     if wskey and "pin" in wskey and "wskey" in wskey:
         url = "https://plogin.m.jd.com/jd-mlogin/static/html/appjmp_blank.html"
         body = '{"to":"%s"}' % url
-        sign = get_sign("genToken", body, "".join(str(uuid.uuid4()).split("-")), "apple", "10.0.10")
+        sign = get_sign("genToken", body, "".join(str(uuid.uuid4()).split("-")), "android", "11.1.4")
         body = f'body={quote(body)}'
         cookie = get_cookie(sign, body, wskey)
         if cookie:
