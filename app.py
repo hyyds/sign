@@ -157,7 +157,7 @@ def main():
         while True:
             try:
                 sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "android", "11.1.4")
-            Exception as e:
+            except Exception as e:
                 pass
             finally:
                 break          
