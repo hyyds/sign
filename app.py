@@ -7,7 +7,6 @@ import hashlib
 import time
 import uuid
 import logging
-import random
 from urllib.parse import quote
 from requests import post, get
 from urllib3 import disable_warnings
@@ -108,13 +107,13 @@ def sub_126AC(input, random1, random2):
 
 def get_sign(functionId, body, uuid, client, clientVersion):
     st = str(int(time.time() * 1000))
-    random1 = random.randint(0, 2)
-    random2 = random.randint(0, 2)
+    random1, random2 = 2, 0
     sv = f"{random1}{random2}"
     string = f"functionId={functionId}&body={body}&uuid={uuid}&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
     ret_bytes = sub_126AC(str.encode(string), random1, random2)
     sign = f"client={client}&clientVersion={clientVersion}&uuid={uuid}&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
     return sign
+
 
 def get_cookie(sign, body, key):
     url = f"https://api.m.jd.com/client.action?functionId=genToken&{sign}"
@@ -154,14 +153,7 @@ def main():
     body = request.values.get('body') or request.get_json()['body']
     wskey = request.values.get('wskey')
     if fn:
-        berror = True
-        while berror == True:
-            try:
-                sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "android", "11.1.4")
-                berror = False
-            except Exception as e:
-                berror = True
-                pass          
+        sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "android", "11.1.4")
         res = {"code": 200, "data": {"sign": f'body={quote(body)}&{sign}'}}
     else:
         res = {"code": 400, "data": "请传入url参数！"}
