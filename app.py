@@ -107,7 +107,7 @@ def sub_126AC(input, random1, random2):
 
 def get_sign(functionId, body, uuid, client, clientVersion):
     st = str(int(time.time() * 1000))
-    random1, random2 = 2, 0
+    random1, random2 = 1, 2
     sv = f"{random1}{random2}"
     string = f"functionId={functionId}&body={body}&uuid={uuid}&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
     ret_bytes = sub_126AC(str.encode(string), random1, random2)
