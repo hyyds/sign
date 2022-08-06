@@ -112,10 +112,10 @@ def get_sign(functionId, body, uuid, client, clientVersion):
     ep = json.dumps({"ciphertype":5,"cipher":{"screen":"CJO3CMeyDJCy","area":"CV8yEJUzXzU0CNG0XzK=","wifiBssid":"DQPrDwHwDWDtDzZtDQOnCWS5YWPwDwY1DzHuYWHvDWG=","osVersion":"CJGkCm==","uuid":uuid,"adid":"EJUyDtHPEJGjHJS5CI00DUZMBUTPCuUjGzu0GJDNGJCmDzO3","openudid":"CtYyENcnZQO5Y2OzYwGnDtVuZtq4CQG5D2VrYJc2Y2ZrYzVuC2Y3Zq=="},"ts":int(time.time()),"hdid":"JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=","version":"1.0.3","appname":"com.360buy.jdmobile","ridx":-1})
     print(ep)
     print(body)
-    string = f"functionId={functionId}&body={body}&client={client}&clientVersion={clientVersion}&uuid={uuid}&st={st}&sv=1{sv}"
+    string = f"functionId={functionId}&body={body}&uuid={uuid}&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
     print(string)
     ret_bytes = sub_126AC(str.encode(string), random1, random2)
-    sign = f"client={client}&clientVersion={clientVersion}&ep={quote(ep)}&ef=1&uuid={uuid}&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
+    sign = f"client={client}&clientVersion={clientVersion}&uuid={uuid}&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
     return sign
 
 
