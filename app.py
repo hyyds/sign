@@ -158,7 +158,7 @@ def main():
     wskey = request.values.get('wskey')
     if fn:
         sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "apple", "10.4.0")
-        res = {"code": 200, "data": {"sign": f'body={quote(json.dumps(body)}&{sign}'}}
+        res = {"code": 200, "data": {"sign": f'body={quote(json.dumps(body))}&{sign}'}}
     else:
         res = {"code": 400, "data": "请传入url参数！"}
     if fn:
