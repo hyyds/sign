@@ -109,7 +109,7 @@ def get_sign(functionId, body, uuid, client, clientVersion):
     st = str(int(time.time() * 1000))
     random1, random2 = 2, 0
     sv = f"{random1}{random2}"
-    ep = {"ciphertype":5,"cipher":{"screen":"CJO3CMeyDJCy","area":"CV8yEJUzXzU0CNG0XzK=","wifiBssid":"DQPrDwHwDWDtDzZtDQOnCWS5YWPwDwY1DzHuYWHvDWG=","osVersion":"CJGkCm==","uuid":uuid,"adid":"EJUyDtHPEJGjHJS5CI00DUZMBUTPCuUjGzu0GJDNGJCmDzO3","openudid":"CtYyENcnZQO5Y2OzYwGnDtVuZtq4CQG5D2VrYJc2Y2ZrYzVuC2Y3Zq=="},"ts":int(time.time()),"hdid":"JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=","version":"1.0.3","appname":"com.360buy.jdmobile","ridx":-1}
+    ep = json.dumps({"ciphertype":5,"cipher":{"screen":"CJO3CMeyDJCy","area":"CV8yEJUzXzU0CNG0XzK=","wifiBssid":"DQPrDwHwDWDtDzZtDQOnCWS5YWPwDwY1DzHuYWHvDWG=","osVersion":"CJGkCm==","uuid":uuid,"adid":"EJUyDtHPEJGjHJS5CI00DUZMBUTPCuUjGzu0GJDNGJCmDzO3","openudid":"CtYyENcnZQO5Y2OzYwGnDtVuZtq4CQG5D2VrYJc2Y2ZrYzVuC2Y3Zq=="},"ts":int(time.time()),"hdid":"JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=","version":"1.0.3","appname":"com.360buy.jdmobile","ridx":-1})
     print(ep)
     print(body)
     string = f"functionId={functionId}&body={body}&ep={ep}&ef=1&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
