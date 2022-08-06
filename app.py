@@ -112,10 +112,10 @@ def get_sign(functionId, body, uuid, client, clientVersion):
     ep = json.dumps({"ciphertype":5,"cipher":{"screen":"CJO3CMeyDJCy","area":"CV8yEJUzXzU0CNG0XzK=","wifiBssid":"DQPrDwHwDWDtDzZtDQOnCWS5YWPwDwY1DzHuYWHvDWG=","osVersion":"CJGkCm==","uuid":uuid,"adid":"EJUyDtHPEJGjHJS5CI00DUZMBUTPCuUjGzu0GJDNGJCmDzO3","openudid":"CtYyENcnZQO5Y2OzYwGnDtVuZtq4CQG5D2VrYJc2Y2ZrYzVuC2Y3Zq=="},"ts":int(time.time()),"hdid":"JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=","version":"1.0.3","appname":"com.360buy.jdmobile","ridx":-1})
     print(ep)
     print(body)
-    string = f"functionId={functionId}&body={body}&ef=1&ep={ep}&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
+    string = f"functionId={functionId}&body={body}&ep={ep}&ef=1&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
     print(string)
     ret_bytes = sub_126AC(str.encode(string), random1, random2)
-    sign = f"client={client}&clientVersion={clientVersion}&ef=1&ep={quote(ep)}&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
+    sign = f"client={client}&clientVersion={clientVersion}&ep={quote(ep)}&ef=1&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
     return sign
 
 
@@ -158,7 +158,7 @@ def main():
     wskey = request.values.get('wskey')
     if fn:
         sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "apple", "10.4.0")
-        res = {"code": 200, "data": {"sign": f'body={quote(body)}&{sign}'}}
+        res = {"code": 200, "data": {"sign": f'body={quote(json.dumps(body)}&{sign}'}}
     else:
         res = {"code": 400, "data": "请传入url参数！"}
     if fn:
