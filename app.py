@@ -153,7 +153,7 @@ def main():
     body = request.values.get('body') or request.get_json()['body']
     wskey = request.values.get('wskey')
     if fn:
-        sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "apple", "10.4.0")
+        sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "apple", "11.1.4")
         res = {"code": 200, "data": {"sign": f'body={quote(body)}&{sign}'}}
     else:
         res = {"code": 400, "data": "请传入url参数！"}
@@ -163,7 +163,7 @@ def main():
     if wskey and "pin" in wskey and "wskey" in wskey:
         url = "https://plogin.m.jd.com/jd-mlogin/static/html/appjmp_blank.html"
         body = '{"to":"%s"}' % url
-        sign = get_sign("genToken", body, "".join(str(uuid.uuid4()).split("-")), "apple", "10.4.0")
+        sign = get_sign("genToken", body, "".join(str(uuid.uuid4()).split("-")), "apple", "11.1.4")
         body = f'body={quote(body)}'
         cookie = get_cookie(sign, body, wskey)
         if cookie:
