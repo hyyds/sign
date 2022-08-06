@@ -109,9 +109,10 @@ def get_sign(functionId, body, uuid, client, clientVersion):
     st = str(int(time.time() * 1000))
     random1, random2 = 2, 0
     sv = f"{random1}{random2}"
-    string = f"functionId={functionId}&body={body}&uuid={uuid}&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
+    ep = json.dumps({"ciphertype":5,"cipher":{"screen":"CJO3CMeyDJCy","area":"CV8yEJUzXzU0CNG0XzK=","wifiBssid":"DQPrDwHwDWDtDzZtDQOnCWS5YWPwDwY1DzHuYWHvDWG=","osVersion":"CJGkCm==","uuid":uuid,"adid":"EJUyDtHPEJGjHJS5CI00DUZMBUTPCuUjGzu0GJDNGJCmDzO3","openudid":"CtYyENcnZQO5Y2OzYwGnDtVuZtq4CQG5D2VrYJc2Y2ZrYzVuC2Y3Zq=="},"ts":int(time.time()),"hdid":"JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=","version":"1.0.3","appname":"com.360buy.jdmobile","ridx":-1})
+    string = f"functionId={functionId}&body={body}&ef=1&ep={ep}&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
     ret_bytes = sub_126AC(str.encode(string), random1, random2)
-    sign = f"client={client}&clientVersion={clientVersion}&uuid={uuid}&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
+    sign = f"client={client}&clientVersion={clientVersion}&ef=1&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
     return sign
 
 
@@ -153,7 +154,7 @@ def main():
     body = request.values.get('body') or request.get_json()['body']
     wskey = request.values.get('wskey')
     if fn:
-        sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "android", "11.1.4")
+        sign = get_sign(fn, body, "".join(str(uuid.uuid4()).split("-")), "apple", "10.4.0")
         res = {"code": 200, "data": {"sign": f'body={quote(body)}&{sign}'}}
     else:
         res = {"code": 400, "data": "请传入url参数！"}
@@ -163,7 +164,7 @@ def main():
     if wskey and "pin" in wskey and "wskey" in wskey:
         url = "https://plogin.m.jd.com/jd-mlogin/static/html/appjmp_blank.html"
         body = '{"to":"%s"}' % url
-        sign = get_sign("genToken", body, "".join(str(uuid.uuid4()).split("-")), "android", "11.1.4")
+        sign = get_sign("genToken", body, "".join(str(uuid.uuid4()).split("-")), "apple", "10.4.0")
         body = f'body={quote(body)}'
         cookie = get_cookie(sign, body, wskey)
         if cookie:
