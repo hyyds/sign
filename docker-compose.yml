@@ -1,0 +1,9 @@
+version: "2.0"
+services:
+  official:
+    image: chiupam/official:latest
+    container_name: official
+    restart: always
+    hostname: official
+    ports:
+      - 9000:80
