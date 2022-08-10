@@ -6,4 +6,4 @@ services:
     restart: always
     hostname: official
     ports:
-      - 2022:80
+      - 9000:80
