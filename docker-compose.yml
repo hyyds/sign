@@ -1,7 +1,7 @@
 version: "2.0"
 services:
   official:
-    image: chiupam/official:latest
+    image: akashifd/official
     container_name: official
     restart: always
     hostname: official
