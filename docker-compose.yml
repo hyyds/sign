@@ -1,9 +1,9 @@
 version: "2.0"
 services:
-  official:
-    image: akashifd/official
-    container_name: official
+  jd_sign:
+    image: jd_sign:latest
+    container_name: jd_sign
     restart: always
-    hostname: official
+    hostname: jd_sign
     ports:
-      - 9000:80
+      - 8840:8840
