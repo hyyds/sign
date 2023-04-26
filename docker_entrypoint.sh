@@ -24,6 +24,6 @@ echo "--------------------------------------------------开启python service----
 
 echo "启动python service服务..."
 
-nohup python3 /jd_sign/signapi.py
+python3 /jd_sign/signapi.py
 
 echo "python service服务任务执行结束。"
