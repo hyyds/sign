@@ -1,6 +1,6 @@
 # 极氪 007
 # Quantumult X →「重写」→ + →「资源」→ 填本文件 raw 地址
-# 列表里这条的开关 = 一键启用 / 停用
+# 这一条就够了，车型和车系都在里面
 # ⚠️ 同时只开一个车型，多个一起开会互相覆盖
 
 ^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/order\/getConfigByVin.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_007.js
@@ -8,5 +8,6 @@
 ^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/vehicle\/getUserOrderSub.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_007.js
 ^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/order\/vehicle\/listVehicleByUserPhones.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_007.js
 ^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/order\/getVehiclePicUrlByVin.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_007.js
+^https:\/\/gric-api\.geely\.com\/ms-vehicle-core\/api\/v1\.0\/vehicle\/favorite-vehicles.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_007.js
 
-hostname = api-gw-toc.zeekrlife.com
+hostname = api-gw-toc.zeekrlife.com, gric-api.geely.com
