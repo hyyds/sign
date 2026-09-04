@@ -16,7 +16,7 @@ const tail = url.split("?")[0].split("/").pop();
 let body   = $response.body;
 
 // ============ 改这三行 ============
-const C = "C001";   // 车漆
+const C = "C008";   // 车漆
 const S = "S003";   // 车顶
 const H = "H006";   // 轮毂
 // =================================
