@@ -1,0 +1,13 @@
+# 【实验】极氪 001 FR —— 验证车模是否只靠 seriesCode 决定
+# Quantumult X →「重写」→ + →「资源」→ 填本文件 raw 地址
+# 只开这一条，其余车型资源全部关掉
+# 测完请关掉
+
+^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/order\/getConfigByVin.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_001fr_test.js
+^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/vehicle\/toc\/sublistV3.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_001fr_test.js
+^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/vehicle\/getUserOrderSub.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_001fr_test.js
+^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/order\/vehicle\/listVehicleByUserPhones.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_001fr_test.js
+^https:\/\/api-gw-toc\.zeekrlife\.com\/zeekrlife-mp-order\/v1\/order\/getVehiclePicUrlByVin.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_001fr_test.js
+^https:\/\/gric-api\.geely\.com\/ms-vehicle-core\/api\/v1\.0\/vehicle\/favorite-vehicles.* url script-response-body https://raw.githubusercontent.com/hyyds/sign/main/zeekr_001fr_test.js
+
+hostname = api-gw-toc.zeekrlife.com, gric-api.geely.com
