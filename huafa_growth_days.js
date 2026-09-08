@@ -93,31 +93,38 @@ if (!ENABLED || typeof responseBody !== "string" || !responseBody.length) {
   // 一进来先把响应体原文开头亮出来, 用于判断 body 到底是不是纯密文
   note("触发", "len=" + responseBody.length, "原文前80=" + responseBody.substring(0, 80));
   try {
-    const plainBytes = cbcDecrypt(b64ToBytes(responseBody), AES_KEY, AES_IV);
-    const plainText  = utf8Decode(plainBytes);
-    const growthObject = JSON.parse(plainText);
+    const envelope = JSON.parse(responseBody);   // 外层: {"code","msg","time","data":"密文"}
 
-    if (typeof growthObject.currentGrowthValue === "number") {
-      let levelThreshold = 0;
-      if (growthObject.levelList) {
-        for (let i = 0; i < growthObject.levelList.length; i++) {
-          if (growthObject.levelList[i].level === growthObject.level) {
-            levelThreshold = growthObject.levelList[i].absoluteValue;
-            break;
+    if (typeof envelope.data !== "string" || !envelope.data.length) {
+      note("跳过", "外层无 data 密文字段", "");
+      $done({});
+    } else {
+      const plainText    = utf8Decode(cbcDecrypt(b64ToBytes(envelope.data), AES_KEY, AES_IV));
+      const growthObject = JSON.parse(plainText);
+
+      if (typeof growthObject.currentGrowthValue === "number") {
+        let levelThreshold = 0;
+        if (growthObject.levelList) {
+          for (let i = 0; i < growthObject.levelList.length; i++) {
+            if (growthObject.levelList[i].level === growthObject.level) {
+              levelThreshold = growthObject.levelList[i].absoluteValue;
+              break;
+            }
           }
         }
+        const totalPoints = levelThreshold + growthObject.currentGrowthValue;
+        const skateDays   = Math.floor(totalPoints / POINTS_PER_DAY);
+        growthObject.currentGrowthValue = "滑行" + skateDays + "天";
+        // growthObject.currentLevelName = "已滑行" + skateDays + "天"; // 想连等级名一起改, 取消本行注释
+        note("成功", "滑行" + skateDays + "天", "门槛" + levelThreshold + "+余额=" + totalPoints);
+      } else {
+        note("跳过", requestTail, "无 currentGrowthValue 数字字段");
       }
-      const totalPoints = levelThreshold + growthObject.currentGrowthValue;
-      const skateDays   = Math.floor(totalPoints / POINTS_PER_DAY);
-      growthObject.currentGrowthValue = "滑行" + skateDays + "天";
-      // growthObject.currentLevelName = "已滑行" + skateDays + "天"; // 想连等级名一起改, 取消本行注释
-      note("成功", "滑行" + skateDays + "天", "门槛" + levelThreshold + "+余额=" + totalPoints);
-    } else {
-      note("跳过", requestTail, "无 currentGrowthValue 数字字段");
-    }
 
-    const newBody = bytesToB64(cbcEncrypt(utf8Encode(JSON.stringify(growthObject)), AES_KEY, AES_IV));
-    $done({ body: newBody });
+      // 把改后的明文重新加密, 塞回外层 data 字段, 整个外层 JSON 返回
+      envelope.data = bytesToB64(cbcEncrypt(utf8Encode(JSON.stringify(growthObject)), AES_KEY, AES_IV));
+      $done({ body: JSON.stringify(envelope) });
+    }
 
   } catch (e) {
     note("出错", (e && e.message) || String(e), "原文前60=" + responseBody.substring(0, 60));
