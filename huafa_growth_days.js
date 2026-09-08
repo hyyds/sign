@@ -91,7 +91,7 @@ if (!ENABLED || typeof responseBody !== "string" || !responseBody.length) {
 
 } else {
   // 一进来先把响应体原文开头亮出来, 用于判断 body 到底是不是纯密文
-  note("触发", "len=" + responseBody.length, "原文前80=" + responseBody.substring(0, 80));
+  // note("触发", "len=" + responseBody.length, "原文前80=" + responseBody.substring(0, 80));
   try {
     const envelope = JSON.parse(responseBody);   // 外层: {"code","msg","time","data":"密文"}
 
