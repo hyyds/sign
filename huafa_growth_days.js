@@ -90,11 +90,11 @@ if (!ENABLED || typeof responseBody !== "string" || !responseBody.length) {
   $done({});
 
 } else {
+  // 一进来先把响应体原文开头亮出来, 用于判断 body 到底是不是纯密文
+  note("触发", "len=" + responseBody.length, "原文前80=" + responseBody.substring(0, 80));
   try {
     const plainBytes = cbcDecrypt(b64ToBytes(responseBody), AES_KEY, AES_IV);
     const plainText  = utf8Decode(plainBytes);
-    note("触发", requestTail, "body=" + responseBody.length + " 解密前80=" + plainText.substring(0, 80));
-
     const growthObject = JSON.parse(plainText);
 
     if (typeof growthObject.currentGrowthValue === "number") {
@@ -120,7 +120,7 @@ if (!ENABLED || typeof responseBody !== "string" || !responseBody.length) {
     $done({ body: newBody });
 
   } catch (e) {
-    note("出错", (e && e.message) || String(e), "");
+    note("出错", (e && e.message) || String(e), "原文前60=" + responseBody.substring(0, 60));
     $done({}); // 出错放行原始响应, 避免小程序拿不到数据
   }
 }
