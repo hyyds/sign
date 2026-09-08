@@ -1,17 +1,24 @@
-/*
- * 华发小程序 user/growth 响应重写 —— 把 currentGrowthValue(成长值) 换算成"已滑行天数"
- * 换算规则: 每次滑行 +1000 成长值, 故 天数 = floor(成长值 / 每次积分)
- * 响应是 AES-128-CBC 加密的, 改完必须重新加密, 否则小程序解密失败
- *
- * QX 用法(见文件末尾注释): rewrite_local + mitm hostname v5.ilifeceo.cn
+/**
+ * ============================================================
+ *  华发 · 滑行天数    Quantumult X · script-response-body
+ *  配套资源: huafa_growth_days.snippet
+ * ------------------------------------------------------------
+ *  把 user/growth 响应里的 currentGrowthValue(成长值)
+ *  渲染成 "滑行XX天"。
+ *  换算: 总积分 = 当前等级门槛(levelList.absoluteValue) + 余额
+ *        天数   = floor(总积分 / 每次积分)
+ *  响应是 AES-128-CBC 加密, 解密->改值->重加密, 需开启 MITM。
+ *  测完把这条资源关掉即可。
+ * ============================================================
  */
 
-// ============ 可调参数 ============
-var POINTS_PER_DAY = 1000; // 每次滑行获得的成长值
-// =================================
+const ENABLED        = true;
+const DEBUG          = true;
+const POINTS_PER_DAY = 1000;              // 每次滑行获得的成长值
+const AES_KEY        = "BiwhZQXWSFEomnlr";
+const AES_IV         = "1673492601549025";
 
-var AES_KEY = "BiwhZQXWSFEomnlr";
-var AES_IV  = "1673492601549025";
+function note(a, b, c){ if(DEBUG && typeof $notify !== "undefined") $notify("华发·滑行天数 " + a, b || "", c || ""); }
 
 // ---------- 纯JS AES-128-CBC ----------
 var SBOX=[],INV_SBOX=[],RCON=[0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x1b,0x36];
@@ -75,43 +82,45 @@ else{var cp=((c&0x07)<<18)|((bytes[i++]&0x3f)<<12)|((bytes[i++]&0x3f)<<6)|(bytes
 s+=String.fromCharCode(0xd800+(cp>>10),0xdc00+(cp&0x3ff));}}return s;}
 
 // ---------- 主逻辑 ----------
-function rewriteBody(bodyB64){
-  var plainBytes=cbcDecrypt(b64ToBytes(bodyB64),AES_KEY,AES_IV);
-  var text=utf8Decode(plainBytes);
-  var obj;
-  try{ obj=JSON.parse(text); }
-  catch(pe){ throw new Error("解密后非JSON | 解密前100=["+text.substring(0,100)+"] | body前60=["+String(bodyB64).substring(0,60)+"]"); }
-  if(typeof obj.currentGrowthValue==="number"){
-    // 还原滑行总积分 = 当前等级门槛(absoluteValue) + 进入该等级后攒的余额(currentGrowthValue)
-    var threshold=0;
-    if(obj.levelList){for(var i=0;i<obj.levelList.length;i++){if(obj.levelList[i].level===obj.level){threshold=obj.levelList[i].absoluteValue;break;}}}
-    var totalPoints=threshold+obj.currentGrowthValue;
-    var days=Math.floor(totalPoints/POINTS_PER_DAY);
-    obj.currentGrowthValue="滑行"+days+"天";        // 直接渲染成 "滑行XX天"
-    // obj.currentLevelName="已滑行"+days+"天";    // 想让等级名也直接显示天数,取消本行注释
-  }
-  var newCipher=cbcEncrypt(utf8Encode(JSON.stringify(obj)),AES_KEY,AES_IV);
-  return bytesToB64(newCipher);
-}
+const requestUrl = ($request && $request.url) ? $request.url : "";
+const requestTail = requestUrl.split("?")[0].split("/").pop();
+let responseBody = ($response && $response.body) ? $response.body : "";
 
-// QX 入口
-if(typeof $response!=="undefined"){
-  try{
-    var nb=rewriteBody($response.body);
-    $done({body:nb});
-  }catch(e){
-    if(typeof $notify!=="undefined") $notify("HF·滑行天数 调试", "解密/解析失败", (e&&e.message)||String(e));
+if (!ENABLED || typeof responseBody !== "string" || !responseBody.length) {
+  $done({});
+
+} else {
+  try {
+    const plainBytes = cbcDecrypt(b64ToBytes(responseBody), AES_KEY, AES_IV);
+    const plainText  = utf8Decode(plainBytes);
+    note("触发", requestTail, "body=" + responseBody.length + " 解密前80=" + plainText.substring(0, 80));
+
+    const growthObject = JSON.parse(plainText);
+
+    if (typeof growthObject.currentGrowthValue === "number") {
+      let levelThreshold = 0;
+      if (growthObject.levelList) {
+        for (let i = 0; i < growthObject.levelList.length; i++) {
+          if (growthObject.levelList[i].level === growthObject.level) {
+            levelThreshold = growthObject.levelList[i].absoluteValue;
+            break;
+          }
+        }
+      }
+      const totalPoints = levelThreshold + growthObject.currentGrowthValue;
+      const skateDays   = Math.floor(totalPoints / POINTS_PER_DAY);
+      growthObject.currentGrowthValue = "滑行" + skateDays + "天";
+      // growthObject.currentLevelName = "已滑行" + skateDays + "天"; // 想连等级名一起改, 取消本行注释
+      note("成功", "滑行" + skateDays + "天", "门槛" + levelThreshold + "+余额=" + totalPoints);
+    } else {
+      note("跳过", requestTail, "无 currentGrowthValue 数字字段");
+    }
+
+    const newBody = bytesToB64(cbcEncrypt(utf8Encode(JSON.stringify(growthObject)), AES_KEY, AES_IV));
+    $done({ body: newBody });
+
+  } catch (e) {
+    note("出错", (e && e.message) || String(e), "");
     $done({}); // 出错放行原始响应, 避免小程序拿不到数据
   }
 }
-
-// 本地测试导出
-if(typeof module!=="undefined"){module.exports={rewriteBody:rewriteBody};}
-
-/* ===== QX 配置 =====
-[rewrite_local]
-^https:\/\/v5\.ilifeceo\.cn\/api\/user\/growth url script-response-body huafa_growth_days.js
-
-[mitm]
-hostname = v5.ilifeceo.cn
-*/
