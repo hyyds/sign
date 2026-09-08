@@ -77,7 +77,10 @@ s+=String.fromCharCode(0xd800+(cp>>10),0xdc00+(cp&0x3ff));}}return s;}
 // ---------- 主逻辑 ----------
 function rewriteBody(bodyB64){
   var plainBytes=cbcDecrypt(b64ToBytes(bodyB64),AES_KEY,AES_IV);
-  var obj=JSON.parse(utf8Decode(plainBytes));
+  var text=utf8Decode(plainBytes);
+  var obj;
+  try{ obj=JSON.parse(text); }
+  catch(pe){ throw new Error("解密后非JSON | 解密前100=["+text.substring(0,100)+"] | body前60=["+String(bodyB64).substring(0,60)+"]"); }
   if(typeof obj.currentGrowthValue==="number"){
     // 还原滑行总积分 = 当前等级门槛(absoluteValue) + 进入该等级后攒的余额(currentGrowthValue)
     var threshold=0;
@@ -93,8 +96,13 @@ function rewriteBody(bodyB64){
 
 // QX 入口
 if(typeof $response!=="undefined"){
-  var nb=rewriteBody($response.body);
-  $done({body:nb});
+  try{
+    var nb=rewriteBody($response.body);
+    $done({body:nb});
+  }catch(e){
+    if(typeof $notify!=="undefined") $notify("HF·滑行天数 调试", "解密/解析失败", (e&&e.message)||String(e));
+    $done({}); // 出错放行原始响应, 避免小程序拿不到数据
+  }
 }
 
 // 本地测试导出
