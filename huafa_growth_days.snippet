@@ -1,0 +1,8 @@
+# 华发·滑行天数
+# 把 user/growth 接口的成长值渲染成"滑行XX天"(AES解密→改值→重加密, 需开启 MITM)
+
+[rewrite_local]
+^https:\/\/v5\.ilifeceo\.cn\/api\/user\/growth url script-response-body huafa_growth_days.js
+
+[mitm]
+hostname = v5.ilifeceo.cn
