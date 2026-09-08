@@ -111,7 +111,7 @@ def get_sign(functionId, body, uuid, client, clientVersion):
     sv = f"{random1}{random2}"
     string = f"functionId={functionId}&body={body}&uuid={uuid}&client={client}&clientVersion={clientVersion}&st={st}&sv=1{sv}"
     ret_bytes = sub_126AC(str.encode(string), random1, random2)
-    sign = f"client={client}&clientVersion={clientVersion}&uuid={uuid}&st={st}&sign={hashlib.md5(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
+    sign = f"client={client}&clientVersion={clientVersion}&uuid={uuid}&st={st}&sign={hashlib.sha256(base64.b64encode(ret_bytes)).hexdigest()}&sv=1{sv}"
     return sign
 
 
@@ -124,7 +124,7 @@ def get_cookie(sign, body, key):
         'content-type': 'application/x-www-form-urlencoded;'
     }
     try:
-        res = post(url, headers=headers, data=body, verify=False)
+        res = post(url, headers=headers, data=body, verify=True, timeout=10)
         token = res.json()['tokenKey']
     except Exception as error:
         return False
@@ -137,7 +137,7 @@ def get_cookie(sign, body, key):
         'appup_type': 1,
     }
     try:
-        res = get(url=url, params=params, verify=False, allow_redirects=False).cookies.get_dict()
+        res = get(url=url, params=params, verify=True, allow_redirects=False, timeout=10).cookies.get_dict()
     except Exception as error:
         return False
     if "app_open" in res['pt_key']:
